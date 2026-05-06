@@ -2,64 +2,100 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-<title>网文灵感·阅读站真实热搜</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>写作工作台</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{background:#000;height:100vh;overflow:hidden;font-family:system-ui}
-.center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
-.main{width:170px;height:170px;border-radius:50%;background:#050510;border:1px solid #222;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px #4a4aff33;cursor:pointer}
-.pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0c0c18;border-radius:20px;padding:22px;width:88%;max-width:460px;color:#eee;display:none;border:1px solid #2a2a44}
-.close{position:absolute;top:14px;right:18px;font-size:24px;color:#aaa;cursor:pointer}
-.load{text-align:center;padding:20px;color:#999}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+html,body{
+  background:#000;
+  height:100vh;
+  overflow:hidden;
+  font-family:system-ui;
+}
+.container{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+/* 主按钮 开始写作 */
+.main-circle{
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:#050508;
+  border:1px solid #222;
+  color:#e5e5e5;
+  font-size:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 0 35px #4050ff26;
+  cursor:pointer;
+  transition:all 0.3s ease;
+}
+.main-circle:active{
+  transform:scale(0.96);
+}
+/* 子按钮统一样式 */
+.sub-circle{
+  position:absolute;
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:#06060a;
+  border:1px solid #222;
+  color:#ccc;
+  font-size:17px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 0 20px #4050ff1a;
+  cursor:pointer;
+  opacity:0;
+  visibility:hidden;
+  transition:all 0.4s ease;
+}
+/* 灵感库位置 */
+.inspire-lib{
+  top:-150px;
+  left:-90px;
+}
+/* 书架位置 */
+.book-shelf{
+  bottom:-150px;
+  left:-90px;
+}
+/* 展开激活态 */
+.container.active .sub-circle{
+  opacity:1;
+  visibility:visible;
+}
 </style>
 </head>
 <body>
-<div class="center">
-  <div class="main" id="btn" onclick="fetchNovelData()">网文灵感</div>
-</div>
 
-<div class="pop" id="box">
-  <div class="close" onclick="closeBox()">×</div>
-  <div class="load" id="loadTxt">阅读站热搜拉取中...</div>
-  <div id="dataBox"></div>
+<div class="container" id="wrap">
+  <div class="main-circle" id="mainBtn">开始写作</div>
+  <div class="sub-circle inspire-lib">灵感库</div>
+  <div class="sub-circle book-shelf">书架</div>
 </div>
 
 <script>
-function closeBox(){
-  box.style.display = 'none';
-}
+const wrap = document.getElementById('wrap');
+const mainBtn = document.getElementById('mainBtn');
 
-async function fetchNovelData(){
-  box.style.display = 'block';
-  loadTxt.style.display = 'block';
-  dataBox.innerHTML = '';
-
-  try {
-    // 只用阅读类API：追书神器（免费、无key、男频女频都有）
-    const res = await fetch('https://api.zhuishushenqi.com/ranking/HotRank');
-    const json = await res.json();
-
-    if(json && json.books && json.books.length>0){
-      // 随机拿一本，不固定题材
-      const book = json.books[Math.floor(Math.random()*json.books.length)];
-      dataBox.innerHTML = `<div style="margin-top:10px;">
-        <h4 style="color:#88aaff;margin-bottom:10px;">${book.title}</h4>
-        <p style="color:#aaa;font-size:14px;">作者：${book.author} · 分类：${book.majorCate}</p>
-        <p style="line-height:1.6;margin-top:8px;">${book.shortIntro || '暂无简介'}</p>
-      </div>`;
-    } else {
-      throw new Error('无数据');
-    }
-  } catch (e) {
-    // 备用：用番茄/聚合网文热搜兜底
-    dataBox.innerHTML = `<div style="margin-top:10px;color:#ff8888;">
-      ⚠️ 接口临时切换，换源再试
-    </div>`;
-  }
-
-  loadTxt.style.display = 'none';
-}
+// 点击展开/收起
+mainBtn.onclick = function(){
+  wrap.classList.toggle('active');
+};
 </script>
+
 </body>
 </html>
