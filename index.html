@@ -19,15 +19,13 @@ html,body{
   font-family:system-ui;
   color:#eee;
 }
-/* 主容器 */
+/* 主界面容器 */
 .container{
   position:absolute;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  transition: all 0.3s ease;
 }
-/* 主圆形按钮 */
 .main-circle{
   width:180px;
   height:180px;
@@ -46,7 +44,6 @@ html,body{
 .main-circle:active{
   transform:scale(0.96);
 }
-/* 子按钮统一样式 */
 .sub-circle{
   position:absolute;
   width:120px;
@@ -65,26 +62,15 @@ html,body{
   visibility:hidden;
   transition:all 0.4s ease;
 }
-/* 三个子按钮位置排布 */
-.inspire-lib{
-  top:-150px;
-  left:-160px;
-}
-.calendar-btn{
-  top:-150px;
-  right:-160px;
-}
-.book-shelf{
-  bottom:-150px;
-  left:50%;
-  transform:translateX(-50%);
-}
+.inspire-lib{ top:-150px; left:-160px; }
+.calendar-btn{ top:-150px; right:-160px; }
+.book-shelf{ bottom:-150px; left:50%; transform:translateX(-50%); }
 .container.active .sub-circle{
   opacity:1;
   visibility:visible;
 }
 
-/* 全屏日历页面 */
+/* 日历全屏页面 */
 .calendar-page{
   position:fixed;
   top:0;
@@ -94,9 +80,8 @@ html,body{
   background:#000;
   display:none;
   z-index:999;
-  padding:60px 20px 20px;
+  padding:60px 15px 20px;
 }
-/* 右上角返回按钮 */
 .back-btn{
   position:absolute;
   top:20px;
@@ -105,13 +90,54 @@ html,body{
   color:#88aaff;
   cursor:pointer;
 }
-/* 日历简单样式 */
-.calendar-box{
+/* 日历切换栏 */
+.cal-tab{
+  display:flex;
+  gap:8px;
+  margin-bottom:15px;
+}
+.cal-tab button{
+  flex:1;
+  padding:10px;
+  background:#0a0a12;
+  border:1px solid #222;
+  color:#ccc;
+  border-radius:8px;
+  cursor:pointer;
+}
+.cal-tab button.active{
+  background:#4a4aff;
+  color:#fff;
+  border-color:#4a4aff;
+}
+/* 日历主体 */
+.cal-wrap{
   width:100%;
-  height:100%;
+  height:calc(100% - 120px);
   border:1px solid #222;
   border-radius:16px;
   padding:15px;
+  overflow-y:auto;
+}
+.day-item{
+  padding:12px;
+  border-bottom:1px solid #222;
+}
+.day-item h4{
+  color:#88aaff;
+  margin-bottom:8px;
+}
+.day-item textarea{
+  width:100%;
+  height:60px;
+  background:#050508;
+  border:1px solid #333;
+  border-radius:6px;
+  padding:8px;
+  color:#eee;
+  outline:none;
+  resize:none;
+  font-size:14px;
 }
 </style>
 </head>
@@ -125,11 +151,20 @@ html,body{
   <div class="sub-circle book-shelf">书架</div>
 </div>
 
-<!-- 全屏日历页面 -->
+<!-- 全屏日历页 -->
 <div class="calendar-page" id="calPage">
   <div class="back-btn" onclick="backToMain()">返回</div>
-  <div class="calendar-box">
-    日历区域（后续可以完善完整日历功能）
+
+  <!-- 日/周/月/年 切换 -->
+  <div class="cal-tab">
+    <button class="active" onclick="switchCal('day')">日</button>
+    <button onclick="switchCal('week')">周</button>
+    <button onclick="switchCal('month')">月</button>
+    <button onclick="switchCal('year')">年</button>
+  </div>
+
+  <div class="cal-wrap" id="calContent">
+    <!-- 日历内容 JS 自动生成 -->
   </div>
 </div>
 
@@ -138,20 +173,78 @@ const wrap = document.getElementById('wrap');
 const mainBtn = document.getElementById('mainBtn');
 const calBtn = document.getElementById('calBtn');
 const calPage = document.getElementById('calPage');
+const calContent = document.getElementById('calContent');
 
-// 开始生活 展开/收起子按钮
+// 主按钮展开收起
 mainBtn.onclick = function(){
   wrap.classList.toggle('active');
 };
 
-// 打开日历全屏页
+// 打开日历
 calBtn.onclick = function(){
   calPage.style.display = 'block';
+  switchCal('day');
 };
 
 // 返回主界面
 function backToMain(){
   calPage.style.display = 'none';
+}
+
+// 切换日周月年
+function switchCal(type){
+  // 切换按钮激活态
+  document.querySelectorAll('.cal-tab button').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  let now = new Date();
+  let y = now.getFullYear();
+  let m = now.getMonth() + 1;
+  let d = now.getDate();
+
+  let html = '';
+  if(type === 'day'){
+    html = `
+      <div class="day-item">
+        <h4>今天：${y}年${m}月${d}日</h4>
+        <textarea placeholder="今日计划 / 待办事项..."></textarea>
+        <textarea placeholder="每日总结 / 心情记录..." style="margin-top:8px;"></textarea>
+      </div>
+    `;
+  }else if(type === 'week'){
+    html = `<h4 style="margin-bottom:10px;">${y}年第${getWeekNum()}周</h4>`;
+    for(let i=0;i<7;i++){
+      let date = getDayOfWeek(i);
+      html += `
+        <div class="day-item">
+          <h4>${date}</h4>
+          <textarea placeholder="计划 / 总结..."></textarea>
+        </div>
+      `;
+    }
+  }else if(type === 'month'){
+    html = `<h4 style="margin-bottom:10px;">${y}年${m}月</h4>
+    <div style="line-height:1.8;color:#ccc;">本月日程、月度目标、月度总结 可自行记录</div>`;
+  }else if(type === 'year'){
+    html = `<h4 style="margin-bottom:10px;">${y}年</h4>
+    <div style="line-height:1.8;color:#ccc;">年度目标、年度规划、整年复盘 记录处</div>`;
+  }
+  calContent.innerHTML = html;
+}
+
+// 工具：获取本周第几周
+function getWeekNum(){
+  let now = new Date();
+  let start = new Date(now.getFullYear(),0,1);
+  let diff = Math.floor((now - start) / (7*24*3600*1000));
+  return diff + 1;
+}
+// 工具：获取本周每一天日期
+function getDayOfWeek(off){
+  let now = new Date();
+  let day = now.getDay();
+  let first = new Date(now.getTime() - (day-1)*24*3600*1000 + off*24*3600*1000);
+  return first.getFullYear() + '年' + (first.getMonth()+1) + '月' + first.getDate() + '日';
 }
 </script>
 
