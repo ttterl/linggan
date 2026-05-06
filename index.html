@@ -19,12 +19,15 @@ html,body{
   font-family:system-ui;
   color:#eee;
 }
+/* 主容器 */
 .container{
   position:absolute;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
+  transition: all 0.3s ease;
 }
+/* 主圆形按钮 */
 .main-circle{
   width:180px;
   height:180px;
@@ -43,6 +46,7 @@ html,body{
 .main-circle:active{
   transform:scale(0.96);
 }
+/* 子按钮统一样式 */
 .sub-circle{
   position:absolute;
   width:120px;
@@ -61,10 +65,14 @@ html,body{
   visibility:hidden;
   transition:all 0.4s ease;
 }
+/* 三个子按钮位置排布 */
 .inspire-lib{
   top:-150px;
-  left:50%;
-  transform:translateX(-50%);
+  left:-160px;
+}
+.calendar-btn{
+  top:-150px;
+  right:-160px;
 }
 .book-shelf{
   bottom:-150px;
@@ -75,21 +83,76 @@ html,body{
   opacity:1;
   visibility:visible;
 }
+
+/* 全屏日历页面 */
+.calendar-page{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100vh;
+  background:#000;
+  display:none;
+  z-index:999;
+  padding:60px 20px 20px;
+}
+/* 右上角返回按钮 */
+.back-btn{
+  position:absolute;
+  top:20px;
+  right:20px;
+  font-size:18px;
+  color:#88aaff;
+  cursor:pointer;
+}
+/* 日历简单样式 */
+.calendar-box{
+  width:100%;
+  height:100%;
+  border:1px solid #222;
+  border-radius:16px;
+  padding:15px;
+}
 </style>
 </head>
 <body>
 
+<!-- 主界面 -->
 <div class="container" id="wrap">
   <div class="main-circle" id="mainBtn">开始生活</div>
   <div class="sub-circle inspire-lib">灵感库</div>
+  <div class="sub-circle calendar-btn" id="calBtn">日历</div>
   <div class="sub-circle book-shelf">书架</div>
+</div>
+
+<!-- 全屏日历页面 -->
+<div class="calendar-page" id="calPage">
+  <div class="back-btn" onclick="backToMain()">返回</div>
+  <div class="calendar-box">
+    日历区域（后续可以完善完整日历功能）
+  </div>
 </div>
 
 <script>
 const wrap = document.getElementById('wrap');
-document.getElementById('mainBtn').onclick = function(){
+const mainBtn = document.getElementById('mainBtn');
+const calBtn = document.getElementById('calBtn');
+const calPage = document.getElementById('calPage');
+
+// 开始生活 展开/收起子按钮
+mainBtn.onclick = function(){
   wrap.classList.toggle('active');
 };
+
+// 打开日历全屏页
+calBtn.onclick = function(){
+  calPage.style.display = 'block';
+};
+
+// 返回主界面
+function backToMain(){
+  calPage.style.display = 'none';
+}
 </script>
 
 </body>
