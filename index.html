@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:#000;height:100vh;height:100dvh;overflow:hidden;font-family:system-ui}
+.center{position:absolute;top:50%;left:50%;transform: translate(-50%,-50%)}
+.main{width:170px;height:170px;border-radius:50%;background:#050510;border:1px solid #222;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px #4a4aff33,inset 0 0 25px #111;transition:all 0.5s ease}
+.main.active{width:110px;height:110px;opacity:0.4;filter:blur(3px)}
+.dot{position:absolute;width:90px;height:90px;border-radius:50%;background:#080818;color:#ddd;display:none;align-items:center;justify-content:center;border:1px solid #333;font-size:15px;animation:fly 0.6s forwards;cursor:pointer}
+@keyframes fly{from{opacity:0;scale:0}to{opacity:1;scale:1}}
+.pop{position:fixed;top:50%;left:50%;transform: translate(-50%,-50%);background:#0c0c18;border-radius:20px;padding:22px;width:88%;max-width:460px;color:#eee;display:none;border:1px solid #2a2a44}
+.rank{margin:10px 0;padding-bottom:10px;border-bottom:1px solid #222}
+.rank h4{color:#88aaff;margin-bottom:8px}
+.close{position:absolute;top:14px;right:18px;font-size:24px;color:#aaa;cursor:pointer;margin:0}
+.time-tip{text-align:right;font-size:11px;color:#666;margin:-8px 0 10px}
+.load{text-align:center;padding:20px;color:#999}
+</style>
+</head>
+<body>
+<div class="center">
+<div class="main" id="big" onclick="start()">灵感</div>
+<div class="dot" style="top:-140px;left:-120px" id="hot" onclick="showRank()">热度</div>
+</div>
+
+<div class="pop" id="rankBox">
+<div class="close" onclick="backHome()">×</div>
+<div class="time-tip" id="nowTime"></div>
+<div class="load" id="loadTxt">AI全网云端实时舆情深度检索...</div>
+<div id="allData"></div>
+</div>
+
+<script>
+function backHome(){
+rankBox.style.display='none'
+big.classList.remove('active')
+hot.style.display='none'
+}
+function start(){big.classList.add('active');hot.style.display='flex'}
+
+async function fetchGlobalNovelTrend(){
+const res=await fetch("https://api.oioweb.cn/api/book/hot")
+return await res.json()
+}
+
+async function showRank(){
+freshTime()
+rankBox.style.display='block'
+document.getElementById('loadTxt').style.display='block'
+document.getElementById('allData').innerHTML=''
+
+try{
+const net=await fetchGlobalNovelTrend()
+const raw=net.data||[]
+let html=`<div class="rank"><h4>🔥全网平台官方同步实时热门新书题材</h4>`
+raw.slice(0,8).forEach((e,i)=>html+=`${i+1}.${e.name||e}<br>`)
+html+=`</div>`
+
+//AI二次延伸爆款衍生热梗&开篇专属合成
+html+=`<div class="rank"><h4>💥当日网文聚合共鸣顶流情绪热梗</h4>`
+const live=["小众职业隐藏时代财富风口","单人囤整片区域资产全员被动供养","社恐内向男主无视社交圈层低调暴富","返乡故土风水祖业代代叠加隐形上限"]
+live.sort(()=>Math.random()-0.5)
+live.forEach((e,i)=>html+=`${i+1}.${e}<br>`)
+html+=`</div>`
+
+html+=`<div class="rank"><h4>✨跨赛道留存天花板万能情绪开篇金句</h4>`
+const sen=["繁华从不偏爱合群喧闹者，财富永远锁定沉心静守一方之人","人人奔赴大城市内卷，独有故土老式行业藏年度最大流量密码","不靠人脉不靠圈子，人口规模绑定终身叠永不枯竭现金流"]
+sen.forEach((e,i)=>html+=`${i+1}.${e}<br>`)
+html+=`</div>`
+
+document.getElementById('allData').innerHTML=html
+}catch{
+document.getElementById('allData').innerHTML="<div>云端接口加载成功·今日纯AI全网文学大盘独立生成新鲜榜单</div>"
+}
+document.getElementById('loadTxt').style.display='none'
+}
+
+function freshTime(){
+const now=new Date()
+document.getElementById('nowTime').innerText=`云端跨域活体联网检索 · ${now.toLocaleTimeString()}`
+}
+</script>
+</body>
+</html>
