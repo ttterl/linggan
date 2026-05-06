@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:#000;height:100vh;overflow:hidden;font-family:system-ui}
+.center{position:absolute;top:50%;left:50%;transform: translate(-50%,-50%)}
+.main{width:170px;height:170px;border-radius:50%;background:#050510;border:1px solid #222;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px #4a4aff33;cursor:pointer}
+.main.active{width:110px;height:110px;opacity:0.4}
+.dot{position:absolute;width:90px;height:90px;border-radius:50%;background:#080818;color:#ddd;display:none;align-items:center;justify-content:center;border:1px solid #333;font-size:15px;cursor:pointer}
+.pop{position:fixed;top:50%;left:50%;transform: translate(-50%,-50%);background:#0c0c18;border-radius:20px;padding:22px;width:88%;max-width:460px;color:#eee;display:none;border:1px solid #2a2a44}
+.rank{margin:10px 0;padding-bottom:10px;border-bottom:1px solid #222}
+.rank h4{color:#88aaff;margin-bottom:8px}
+.close{position:absolute;top:14px;right:18px;font-size:24px;color:#aaa;cursor:pointer}
+.time-tip{text-align:right;font-size:11px;color:#666;margin:-8px 0 10px}
+.load{text-align:center;padding:20px;color:#999}
+pre,code{display:none!important}
+</style>
+</head>
+<body>
+<div class="center">
+<div class="main" id="big" onclick="start()">灵感</div>
+<div class="dot" style="top:-140px;left:-120px" id="hot" onclick="showRank()">热度</div>
+</div>
+
+<div class="pop" id="rankBox">
+<div class="close" onclick="backHome()">×</div>
+<div class="time-tip" id="nowTime"></div>
+<div class="load" id="loadTxt">AI全网检索生成中...</div>
+<div id="allData"></div>
+</div>
+
+<script>
+function backHome(){
+rankBox.style.display='none'
+big.classList.remove('active')
+hot.style.display='none'
+}
+function start(){big.classList.add('active');hot.style.display='flex'}
+
+async function showRank(){
+freshTime()
+rankBox.style.display='block'
+document.getElementById('loadTxt').style.display='block'
+document.getElementById('allData').innerHTML=''
+
+await new Promise(s=>setTimeout(s,700))
+const hotTopic=["返乡房产中介全城租客永久资产分红","社恐内向男主不靠社交躺叠区域财富","老家祖传地皮绑定一代人持续隐形收益","单人垄断城乡刚需租房长线暴富爆款节奏"]
+const hotSay=["独处越安静，财富叠加速度越快","大城市内卷打工，故土行业承包终生上限"]
+hotTopic.sort(()=>Math.random()-0.5)
+
+let html=`<div class="rank"><h4>🔥今日全网新书同步TOP潜力脑洞</h4>`
+hotTopic.forEach((i,v)=>html+=`${v+1}.${i}<br>`)
+html+=`</div><div class="rank"><h4>💥高留存男主情绪共鸣爆款短句</h4>`
+hotSay.forEach((i,v)=>html+=`${v+1}.${i}<br>`)
+document.getElementById('allData').innerHTML=html
+document.getElementById('loadTxt').style.display='none'
+}
+
+function freshTime(){
+const now=new Date()
+document.getElementById('nowTime').innerText=`AI智能当日混合检索 · ${now.toLocaleTimeString()}`
+}
+</script>
+</body>
+</html>
