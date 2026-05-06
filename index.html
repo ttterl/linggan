@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>写作工作台</title>
+<title>生活工作台</title>
 <style>
 *{
   margin:0;
@@ -17,6 +17,7 @@ html,body{
   height:100vh;
   overflow:hidden;
   font-family:system-ui;
+  color:#eee;
 }
 .container{
   position:absolute;
@@ -24,7 +25,6 @@ html,body{
   left:50%;
   transform:translate(-50%,-50%);
 }
-/* 主按钮 开始写作 */
 .main-circle{
   width:180px;
   height:180px;
@@ -43,7 +43,6 @@ html,body{
 .main-circle:active{
   transform:scale(0.96);
 }
-/* 子按钮统一样式 */
 .sub-circle{
   position:absolute;
   width:120px;
@@ -62,17 +61,16 @@ html,body{
   visibility:hidden;
   transition:all 0.4s ease;
 }
-/* 灵感库位置 */
 .inspire-lib{
   top:-150px;
-  left:-90px;
+  left:50%;
+  transform:translateX(-50%);
 }
-/* 书架位置 */
 .book-shelf{
   bottom:-150px;
-  left:-90px;
+  left:50%;
+  transform:translateX(-50%);
 }
-/* 展开激活态 */
 .container.active .sub-circle{
   opacity:1;
   visibility:visible;
@@ -82,17 +80,14 @@ html,body{
 <body>
 
 <div class="container" id="wrap">
-  <div class="main-circle" id="mainBtn">开始写作</div>
+  <div class="main-circle" id="mainBtn">开始生活</div>
   <div class="sub-circle inspire-lib">灵感库</div>
   <div class="sub-circle book-shelf">书架</div>
 </div>
 
 <script>
 const wrap = document.getElementById('wrap');
-const mainBtn = document.getElementById('mainBtn');
-
-// 点击展开/收起
-mainBtn.onclick = function(){
+document.getElementById('mainBtn').onclick = function(){
   wrap.classList.toggle('active');
 };
 </script>
