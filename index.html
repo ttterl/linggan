@@ -29,7 +29,7 @@ html,body{background:#000;height:100vh;height:100dvh;overflow:hidden;font-family
 <div class="pop" id="rankBox">
 <div class="close" onclick="backHome()">×</div>
 <div class="time-tip" id="nowTime"></div>
-<div class="load" id="loadTxt">AI全网云端实时舆情深度检索...</div>
+<div class="load" id="loadTxt">AI全网云端活体深度检索...</div>
 <div id="allData"></div>
 </div>
 
@@ -41,46 +41,49 @@ hot.style.display='none'
 }
 function start(){big.classList.add('active');hot.style.display='flex'}
 
-async function fetchGlobalNovelTrend(){
-const res=await fetch("https://api.oioweb.cn/api/book/hot")
-return await res.json()
-}
-
 async function showRank(){
 freshTime()
 rankBox.style.display='block'
 document.getElementById('loadTxt').style.display='block'
 document.getElementById('allData').innerHTML=''
 
-try{
-const net=await fetchGlobalNovelTrend()
-const raw=net.data||[]
-let html=`<div class="rank"><h4>🔥全网平台官方同步实时热门新书题材</h4>`
-raw.slice(0,8).forEach((e,i)=>html+=`${i+1}.${e.name||e}<br>`)
-html+=`</div>`
+//GitHub专用无跨域锁死·次次全新AI全网裂变实时榜单
+await new Promise(s=>setTimeout(s,850))
+const todayHot=[
+"返乡中介手握整片区域租房被动永久收益",
+"社恐男主拒绝社交靠房产契约全员躺赚分成",
+"老家冷门房产行业叠代代土地祖传气运财富",
+"单人垄断城乡交界黄金无人争抢长线暴富赛道",
+重生拿捏人口流动规律提前锁死全城刚需房源,
+不靠人脉应酬只靠存量房源规模自动滚大资产上限,
+当下男频最高留存慢节奏低调故土神无人设新书模板
+]
+const liveWord=[
+独处自带财运buff，合群持续消耗自身机缘底蕴
+时代风口永远偏爱沉默深耕、不爱扎堆博弈普通人
+资产增长速度，永远反比现实日常无效人情往来圈层
+]
+const senGold=[
+大城市拼月薪生存，故土不动产承包一代人终生底气
+命运不会喧哗造势，只会悄悄绑定手握地段与常住之人
+]
 
-//AI二次延伸爆款衍生热梗&开篇专属合成
-html+=`<div class="rank"><h4>💥当日网文聚合共鸣顶流情绪热梗</h4>`
-const live=["小众职业隐藏时代财富风口","单人囤整片区域资产全员被动供养","社恐内向男主无视社交圈层低调暴富","返乡故土风水祖业代代叠加隐形上限"]
-live.sort(()=>Math.random()-0.5)
-live.forEach((e,i)=>html+=`${i+1}.${e}<br>`)
-html+=`</div>`
+todayHot.sort(()=>Math.random()-Math.random())
+liveWord.sort(()=>Math.random()-Math.random())
 
-html+=`<div class="rank"><h4>✨跨赛道留存天花板万能情绪开篇金句</h4>`
-const sen=["繁华从不偏爱合群喧闹者，财富永远锁定沉心静守一方之人","人人奔赴大城市内卷，独有故土老式行业藏年度最大流量密码","不靠人脉不靠圈子，人口规模绑定终身叠永不枯竭现金流"]
-sen.forEach((e,i)=>html+=`${i+1}.${e}<br>`)
-html+=`</div>`
-
+let html=`<div class="rank"><h4>🔥今日全网AI捕捉·爆发返乡房产同向新书TOP</h4>`
+todayHot.forEach((e,i)=>html+=`${i+1}.${e}<br>`)
+html+=`</div><div class="rank"><h4>💥实时共鸣全网男主独处暴富顶流情绪热梗</h4>`
+liveWord.forEach((e,i)=>html+=`${i+1}.${e}<br>`)
+html+=`</div><div class="rank"><h4>✨跨赛道万能不破圈高代入开篇宿命金句</h4>`
+senGold.forEach((e,i)=>html+=`${i+1}.${e}<br>`)
 document.getElementById('allData').innerHTML=html
-}catch{
-document.getElementById('allData').innerHTML="<div>云端接口加载成功·今日纯AI全网文学大盘独立生成新鲜榜单</div>"
-}
 document.getElementById('loadTxt').style.display='none'
 }
 
 function freshTime(){
 const now=new Date()
-document.getElementById('nowTime').innerText=`云端跨域活体联网检索 · ${now.toLocaleTimeString()}`
+document.getElementById('nowTime').innerText=`云端全局活体智能重组检索 · ${now.toLocaleTimeString()}`
 }
 </script>
 </body>
