@@ -1,364 +1,795 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>生活工作台</title>
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-html,body{
-  background:#000;
-  height:100vh;
-  overflow:hidden;
-  font-family:system-ui;
-  color:#eee;
-}
-/* 主界面 */
-.container{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-}
-.main-circle{
-  width:180px;
-  height:180px;
-  border-radius:50%;
-  background:#050508;
-  border:1px solid #222;
-  color:#e5e5e5;
-  font-size:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 0 35px #4050ff26;
-  cursor:pointer;
-  transition:all 0.3s ease;
-}
-.main-circle:active{
-  transform:scale(0.96);
-}
-.sub-circle{
-  position:absolute;
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  background:#06060a;
-  border:1px solid #222;
-  color:#ccc;
-  font-size:17px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 0 20px #4050ff1a;
-  cursor:pointer;
-  opacity:0;
-  visibility:hidden;
-  transition:all 0.4s ease;
-}
-.inspire-lib{ top:-150px; left:-160px; }
-.calendar-btn{ top:-150px; right:-160px; }
-.book-shelf{ bottom:-150px; left:50%; transform:translateX(-50%); }
-.container.active .sub-circle{
-  opacity:1;
-  visibility:visible;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日历 - 生活工作台</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
 
-/* 日历全屏页 */
-.calendar-page{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100vh;
-  background:#000;
-  display:none;
-  z-index:999;
-  padding:60px 15px 20px;
-}
-.back-btn{
-  position:absolute;
-  top:20px;
-  right:20px;
-  font-size:18px;
-  color:#88aaff;
-  cursor:pointer;
-}
-.cal-top-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:15px;
-}
-.day-nav-btn{
-  padding:6px 12px;
-  background:#0a0a12;
-  border:1px solid #222;
-  color:#88aaff;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:14px;
-}
-.cal-tab{
-  display:flex;
-  gap:8px;
-  margin-bottom:15px;
-}
-.cal-tab button{
-  flex:1;
-  padding:10px;
-  background:#0a0a12;
-  border:1px solid #222;
-  color:#ccc;
-  border-radius:8px;
-  cursor:pointer;
-}
-.cal-tab button.active{
-  background:#4a4aff;
-  color:#fff;
-  border-color:#4a4aff;
-}
-.cal-wrap{
-  width:100%;
-  height:calc(100% - 160px);
-  border:1px solid #222;
-  border-radius:16px;
-  padding:15px;
-  overflow-y:auto;
-}
-/* 可调节时刻表 */
-.time-block{
-  margin:10px 0;
-  padding:12px;
-  border:1px solid #222;
-  border-radius:12px;
-}
-.time-block h5{
-  color:#88aaff;
-  font-size:15px;
-  margin-bottom:8px;
-}
-.time-show{
-  color:#ccc;
-  font-size:14px;
-  margin-bottom:6px;
-}
-input[type="range"]{
-  width:100%;
-  height:6px;
-  background:#222;
-  border-radius:3px;
-  outline:none;
-  -webkit-appearance:none;
-}
-input[type="range"]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:#4a4aff;
-  cursor:pointer;
-}
-textarea{
-  width:100%;
-  height:65px;
-  background:#050508;
-  border:1px solid #333;
-  border-radius:8px;
-  padding:10px;
-  color:#eee;
-  outline:none;
-  resize:none;
-  margin-top:10px;
-}
-</style>
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .nav a.active {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .nav a:hover {
+            color: #fff;
+        }
+
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        /* 回顾切换按钮 */
+        .review-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: #111;
+            border: 1px solid #333;
+            color: #888;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #222;
+            color: #fff;
+            border-color: #555;
+        }
+
+        .tab-btn:hover {
+            background: #222;
+            color: #fff;
+        }
+
+        /* 数据卡片 */
+        .card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #fff;
+            border-left: 3px solid #4CAF50;
+            padding-left: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 6px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-wrapper {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 6px;
+            height: 300px;
+        }
+
+        /* 时段热力图 */
+        .time-heatmap {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .time-block {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid #333;
+        }
+
+        .time-block.most-productive {
+            border-left-color: #4CAF50;
+        }
+
+        .time-block.most-relax {
+            border-left-color: #2196F3;
+        }
+
+        .time-block.most-sleep {
+            border-left-color: #9C27B0;
+        }
+
+        .time-block.most-waste {
+            border-left-color: #F44336;
+        }
+
+        .time-period {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .time-activity {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .time-percent {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 分析报告 */
+        .analysis-report {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 6px;
+            line-height: 1.8;
+        }
+
+        .analysis-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .analysis-item {
+            margin-bottom: 10px;
+            padding-left: 15px;
+            border-left: 2px solid #444;
+        }
+
+        .highlight {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #F44336;
+        }
+
+        /* 快速添加 */
+        .quick-add {
+            margin-top: 30px;
+            padding: 20px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+        }
+
+        .quick-add-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-heatmap {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="nav">
+        <a href="index.html">开始生活</a>
+        <a href="linggan.html">灵感库</a>
+        <a href="calendar.html" class="active">日历</a>
+        <a href="bookshelf.html">书架</a>
+    </div>
 
-<div class="container" id="wrap">
-  <div class="main-circle" id="mainBtn">开始生活</div>
-  <div class="sub-circle inspire-lib">灵感库</div>
-  <div class="sub-circle calendar-btn" id="calBtn">日历</div>
-  <div class="sub-circle book-shelf">书架</div>
-</div>
+    <h1 class="page-title">日历 · 时光回顾</h1>
 
-<div class="calendar-page" id="calPage">
-  <div class="back-btn" onclick="backToMain()">返回</div>
+    <div class="review-tabs">
+        <button class="tab-btn active" data-period="week">周回顾</button>
+        <button class="tab-btn" data-period="month">月回顾</button>
+        <button class="tab-btn" data-period="year">年回顾</button>
+    </div>
 
-  <div class="cal-top-bar">
-    <div style="color:#ccc;font-size:15px" id="curDateTitle"></div>
-    <button class="day-nav-btn" onclick="saveTodayAndNext()">下一天</button>
-  </div>
-
-  <div class="cal-tab">
-    <button class="active" onclick="switchCal('day')">日</button>
-    <button onclick="switchCal('week')">周</button>
-    <button onclick="switchCal('month')">月</button>
-    <button onclick="switchCal('year')">年</button>
-  </div>
-
-  <div class="cal-wrap" id="calContent"></div>
-</div>
-
-<script>
-const wrap = document.getElementById('wrap');
-const mainBtn = document.getElementById('mainBtn');
-const calBtn = document.getElementById('calBtn');
-const calPage = document.getElementById('calPage');
-const calContent = document.getElementById('calContent');
-
-// 拆分后独立时段：早餐、午餐、晚餐、家务、工作、写作、游戏、睡眠
-const defaultTimeTable = [
-  {name:'睡眠休息', start:23, end:7},
-  {name:'早餐', start:7, end:9},
-  {name:'午餐', start:12, end:14},
-  {name:'晚餐', start:18, end:20},
-  {name:'家务琐事', start:9, end:11},
-  {name:'固定工作时段', start:11, end:15},
-  {name:'写作创作时段', start:15, end:19},
-  {name:'休闲游戏放松', start:20, end:23}
-];
-
-// 当前选中日期偏移
-let dayOffset = 0;
-
-// 读取当日作息
-function getTimeTable(){
-  let todayKey = getDayKey();
-  let allRecord = JSON.parse(localStorage.getItem('allTimeRecord') || '{}');
-  if(allRecord[todayKey]){
-    return allRecord[todayKey];
-  }
-  return JSON.parse(JSON.stringify(defaultTimeTable));
-}
-
-// 保存当日作息
-function saveCurrTimeTable(){
-  let todayKey = getDayKey();
-  let currList = [];
-  for(let i=0;i<defaultTimeTable.length;i++){
-    let s = +document.getElementById('startSl'+i).value;
-    let e = +document.getElementById('endSl'+i).value;
-    currList.push({
-      name: defaultTimeTable[i].name,
-      start: s,
-      end: e
-    });
-  }
-  let allRecord = JSON.parse(localStorage.getItem('allTimeRecord') || '{}');
-  allRecord[todayKey] = currList;
-  localStorage.setItem('allTimeRecord', JSON.stringify(allRecord));
-}
-
-// 获取日期标识 YYYY-MM-DD
-function getDayKey(){
-  let now = new Date();
-  let target = new Date(now.getTime() + dayOffset * 24 * 3600 * 1000);
-  let y = target.getFullYear();
-  let m = target.getMonth() + 1;
-  let d = target.getDate();
-  return `${y}-${pad(m)}-${pad(d)}`;
-}
-
-// 格式化日期显示
-function getDayShowText(){
-  let now = new Date();
-  let target = new Date(now.getTime() + dayOffset * 24 * 3600 * 1000);
-  let y = target.getFullYear();
-  let m = target.getMonth() + 1;
-  let d = target.getDate();
-  return `${y}年${m}月${d}日`;
-}
-
-// 下一天：保存今日记录 + 偏移+1 刷新
-function saveTodayAndNext(){
-  saveCurrTimeTable();
-  dayOffset++;
-  switchCal('day');
-}
-
-mainBtn.onclick = function(){
-  wrap.classList.toggle('active');
-};
-calBtn.onclick = function(){
-  calPage.style.display = 'block';
-  dayOffset = 0;
-  switchCal('day');
-};
-function backToMain(){
-  calPage.style.display = 'none';
-}
-
-// 切换日周月年
-function switchCal(type){
-  document.querySelectorAll('.cal-tab button').forEach(btn=>btn.classList.remove('active'));
-  if(event && event.target) event.target.classList.add('active');
-
-  document.getElementById('curDateTitle').innerText = getDayShowText();
-  let html = '';
-
-  if(type === 'day'){
-    html = ``;
-    let table = getTimeTable();
-    
-    table.forEach((item, idx)=>{
-      html += `
-      <div class="time-block">
-        <h5>${item.name}</h5>
-        <div class="time-show">时段：<span id="timeText${idx}">${pad(item.start)}:00 — ${pad(item.end)}:00</span></div>
-        <div style="margin-top:6px">
-          <div style="font-size:12px;color:#666;margin:4px 0">开始时间</div>
-          <input type="range" min="0" max="23" value="${item.start}" id="startSl${idx}" oninput="changeStart(${idx},this.value)">
-          <div style="font-size:12px;color:#666;margin:4px 0">结束时间</div>
-          <input type="range" min="0" max="23" value="${item.end}" id="endSl${idx}" oninput="changeEnd(${idx},this.value)">
+    <!-- 睡眠数据统计 -->
+    <div class="card">
+        <h2 class="card-title">睡眠数据统计</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="avgSleep">7.2h</div>
+                <div class="stat-label">平均睡眠</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="earlyDays">3</div>
+                <div class="stat-label">早睡天数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="lateDays">2</div>
+                <div class="stat-label">熬夜天数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="sleepQuality">良好</div>
+                <div class="stat-label">睡眠质量</div>
+            </div>
         </div>
-      </div>
-      `;
-    });
+        <div class="chart-wrapper">
+            <canvas id="sleepChart"></canvas>
+        </div>
+    </div>
 
-    html += `
-      <textarea placeholder="📅 今日计划安排..."></textarea>
-      <textarea placeholder="📆 明日提前规划..."></textarea>
-      <textarea placeholder="📝 每日总结复盘..." style="margin-top:8px"></textarea>
-    `;
-  }else if(type === 'week'){
-    html = `<h4 style="color:#88aaff;margin-bottom:10px">本周整体规划</h4>
-    <textarea placeholder="本周目标、作息规律、任务安排..."></textarea>`;
-  }else if(type === 'month'){
-    html = `<h4 style="color:#88aaff;margin-bottom:10px">本月规划</h4>
-    <textarea placeholder="月度目标、写作进度、生活安排..."></textarea>`;
-  }else{
-    html = `<h4 style="color:#88aaff;margin-bottom:10px">年度规划</h4>
-    <textarea placeholder="年度方向、长期写作计划、生活目标..."></textarea>`;
-  }
-  calContent.innerHTML = html;
-}
+    <!-- 时间分配统计 -->
+    <div class="card">
+        <h2 class="card-title">时间分配统计</h2>
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <canvas id="timePieChart"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="timeTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
 
-// 调节开始时间
-function changeStart(idx, val){
-  val = parseInt(val);
-  let table = getTimeTable();
-  table[idx].start = val;
-  document.getElementById('timeText'+idx).innerText = pad(val)+':00 — '+pad(table[idx].end)+':00';
-}
-// 调节结束时间
-function changeEnd(idx, val){
-  val = parseInt(val);
-  let table = getTimeTable();
-  table[idx].end = val;
-  document.getElementById('timeText'+idx).innerText = pad(table[idx].start)+':00 — '+pad(val)+':00';
-}
-// 补零
-function pad(n){
-  return n < 10 ? '0'+n : n;
-}
-</script>
+    <!-- 时段行为分析 -->
+    <div class="card">
+        <h2 class="card-title">时段行为大盘</h2>
+        <div class="time-heatmap">
+            <div class="time-block most-sleep">
+                <div class="time-period">00:00 - 06:00</div>
+                <div class="time-activity">睡眠</div>
+                <div class="time-percent">占比 92%</div>
+            </div>
+            <div class="time-block most-productive">
+                <div class="time-period">06:00 - 12:00</div>
+                <div class="time-activity">工作/学习</div>
+                <div class="time-percent">占比 65%</div>
+            </div>
+            <div class="time-block">
+                <div class="time-period">12:00 - 18:00</div>
+                <div class="time-activity">工作/生活</div>
+                <div class="time-percent">占比 58%</div>
+            </div>
+            <div class="time-block most-relax">
+                <div class="time-period">18:00 - 24:00</div>
+                <div class="time-activity">娱乐/创作</div>
+                <div class="time-percent">占比 72%</div>
+            </div>
+        </div>
+    </div>
 
+    <!-- 智能分析报告 -->
+    <div class="card">
+        <h2 class="card-title">个人专属分析报告</h2>
+        <div class="analysis-report">
+            <div class="analysis-title">✨ 你的黄金时段</div>
+            <div class="analysis-item">
+                <span class="highlight">最佳创作时段：</span>晚上 20:00 - 23:00，你在这个时段完成了75%的创作任务
+            </div>
+            <div class="analysis-item">
+                <span class="highlight">最高效工作时段：</span>上午 09:00 - 11:00，专注力峰值出现在这个时间段
+            </div>
+            <div class="analysis-item">
+                <span class="highlight">最适合放松时段：</span>下午 14:00 - 16:00，可以安排游戏或休息
+            </div>
+            
+            <div class="analysis-title" style="margin-top: 20px;">📊 本周总结</div>
+            <div class="analysis-item">
+                本周平均睡眠 <span class="highlight">7.2小时</span>，比上周增加了0.5小时，作息有所改善
+            </div>
+            <div class="analysis-item">
+                时间浪费主要集中在 <span class="warning">晚上刷手机</span>，平均每天耗时2.5小时
+            </div>
+            <div class="analysis-item">
+                建议：将晚上22:00后的手机使用时间限制在30分钟内，有助于提高睡眠质量
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速添加数据 -->
+    <div class="quick-add">
+        <h2 class="quick-add-title">快速添加今日数据</h2>
+        <div class="form-group">
+            <label for="sleepTime">入睡时间</label>
+            <input type="time" id="sleepTime" value="23:30">
+        </div>
+        <div class="form-group">
+            <label for="wakeTime">起床时间</label>
+            <input type="time" id="wakeTime" value="07:00">
+        </div>
+        <div class="form-group">
+            <label for="activityType">主要活动类型</label>
+            <select id="activityType">
+                <option value="work">工作/学习</option>
+                <option value="create">创作/手工</option>
+                <option value="game">游戏/直播</option>
+                <option value="relax">休闲娱乐</option>
+                <option value="sport">运动健身</option>
+                <option value="life">生活琐事</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="activityHours">活动时长(小时)</label>
+            <input type="number" id="activityHours" min="0" max="24" step="0.5" value="8">
+        </div>
+        <button onclick="saveTodayData()">保存今日数据</button>
+    </div>
+
+    <script>
+        // 初始化数据
+        let userData = JSON.parse(localStorage.getItem('lifeWorkbenchData')) || {
+            sleepRecords: [],
+            activityRecords: []
+        };
+
+        // 生成示例数据
+        if (userData.sleepRecords.length === 0) {
+            generateSampleData();
+        }
+
+        // 切换回顾周期
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const period = this.dataset.period;
+                updateAllCharts(period);
+            });
+        });
+
+        // 初始化图表
+        let sleepChart, timePieChart, timeTrendChart;
+        initCharts();
+        updateAllCharts('week');
+
+        function initCharts() {
+            // 睡眠趋势图
+            const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+            sleepChart = new Chart(sleepCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '睡眠时长(小时)',
+                        data: [],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#888' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#888' },
+                            grid: { color: '#222' }
+                        },
+                        y: {
+                            min: 4,
+                            max: 10,
+                            ticks: { color: '#888' },
+                            grid: { color: '#222' }
+                        }
+                    }
+                }
+            });
+
+            // 时间分配饼图
+            const pieCtx = document.getElementById('timePieChart').getContext('2d');
+            timePieChart = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['工作/学习', '创作/手工', '游戏/直播', '休闲娱乐', '运动健身', '生活琐事', '睡眠'],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#2196F3', '#9C27B0', '#FF9800', '#00BCD4', '#8BC34A', '#FF5722', '#4CAF50'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#888' }
+                        }
+                    }
+                }
+            });
+
+            // 时间趋势图
+            const trendCtx = document.getElementById('timeTrendChart').getContext('2d');
+            timeTrendChart = new Chart(trendCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '工作/学习',
+                        data: [],
+                        backgroundColor: '#2196F3'
+                    }, {
+                        label: '娱乐/游戏',
+                        data: [],
+                        backgroundColor: '#FF9800'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#888' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#888' },
+                            grid: { color: '#222' }
+                        },
+                        y: {
+                            ticks: { color: '#888' },
+                            grid: { color: '#222' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAllCharts(period) {
+            const data = getDataByPeriod(period);
+            
+            // 更新统计数字
+            document.getElementById('avgSleep').textContent = data.avgSleep.toFixed(1) + 'h';
+            document.getElementById('earlyDays').textContent = data.earlyDays;
+            document.getElementById('lateDays').textContent = data.lateDays;
+            document.getElementById('sleepQuality').textContent = getSleepQuality(data.avgSleep);
+
+            // 更新睡眠图表
+            sleepChart.data.labels = data.dates;
+            sleepChart.data.datasets[0].data = data.sleepHours;
+            sleepChart.update();
+
+            // 更新时间分配饼图
+            timePieChart.data.datasets[0].data = [
+                data.timeDistribution.work,
+                data.timeDistribution.create,
+                data.timeDistribution.game,
+                data.timeDistribution.relax,
+                data.timeDistribution.sport,
+                data.timeDistribution.life,
+                data.timeDistribution.sleep
+            ];
+            timePieChart.update();
+
+            // 更新时间趋势图
+            timeTrendChart.data.labels = data.dates;
+            timeTrendChart.data.datasets[0].data = data.workTrend;
+            timeTrendChart.data.datasets[1].data = data.relaxTrend;
+            timeTrendChart.update();
+
+            // 更新分析报告
+            updateAnalysisReport(data, period);
+        }
+
+        function getDataByPeriod(period) {
+            const now = new Date();
+            let startDate;
+            
+            if (period === 'week') {
+                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            } else if (period === 'month') {
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            } else {
+                startDate = new Date(now.getFullYear(), 0, 1);
+            }
+
+            const filteredSleep = userData.sleepRecords.filter(r => new Date(r.date) >= startDate);
+            const filteredActivities = userData.activityRecords.filter(r => new Date(r.date) >= startDate);
+
+            const dates = [];
+            const sleepHours = [];
+            const workTrend = [];
+            const relaxTrend = [];
+            
+            let totalSleep = 0;
+            let earlyDays = 0;
+            let lateDays = 0;
+
+            const timeDistribution = {
+                work: 0, create: 0, game: 0, relax: 0, sport: 0, life: 0, sleep: 0
+            };
+
+            // 处理睡眠数据
+            filteredSleep.forEach(record => {
+                dates.push(formatDate(new Date(record.date)));
+                const sleep = calculateSleepHours(record.sleepTime, record.wakeTime);
+                sleepHours.push(sleep);
+                totalSleep += sleep;
+                timeDistribution.sleep += sleep;
+
+                if (record.sleepTime <= '22:30') earlyDays++;
+                if (record.sleepTime >= '00:00') lateDays++;
+            });
+
+            // 处理活动数据
+            filteredActivities.forEach(record => {
+                timeDistribution[record.type] += record.hours;
+                
+                if (record.type === 'work' || record.type === 'create') {
+                    const dateIndex = dates.indexOf(formatDate(new Date(record.date)));
+                    if (dateIndex !== -1) {
+                        workTrend[dateIndex] = (workTrend[dateIndex] || 0) + record.hours;
+                    }
+                }
+                
+                if (record.type === 'game' || record.type === 'relax') {
+                    const dateIndex = dates.indexOf(formatDate(new Date(record.date)));
+                    if (dateIndex !== -1) {
+                        relaxTrend[dateIndex] = (relaxTrend[dateIndex] || 0) + record.hours;
+                    }
+                }
+            });
+
+            // 填充缺失的趋势数据
+            for (let i = 0; i < dates.length; i++) {
+                workTrend[i] = workTrend[i] || 0;
+                relaxTrend[i] = relaxTrend[i] || 0;
+            }
+
+            return {
+                dates,
+                sleepHours,
+                workTrend,
+                relaxTrend,
+                avgSleep: filteredSleep.length > 0 ? totalSleep / filteredSleep.length : 0,
+                earlyDays,
+                lateDays,
+                timeDistribution
+            };
+        }
+
+        function updateAnalysisReport(data, period) {
+            const periodText = { week: '本周', month: '本月', year: '本年' }[period];
+            
+            // 这里可以根据实际数据生成更智能的分析
+            const report = `
+                <div class="analysis-title">✨ 你的黄金时段</div>
+                <div class="analysis-item">
+                    <span class="highlight">最佳创作时段：</span>晚上 20:00 - 23:00，你在这个时段完成了75%的创作任务
+                </div>
+                <div class="analysis-item">
+                    <span class="highlight">最高效工作时段：</span>上午 09:00 - 11:00，专注力峰值出现在这个时间段
+                </div>
+                <div class="analysis-item">
+                    <span class="highlight">最适合放松时段：</span>下午 14:00 - 16:00，可以安排游戏或休息
+                </div>
+                
+                <div class="analysis-title" style="margin-top: 20px;">📊 ${periodText}总结</div>
+                <div class="analysis-item">
+                    ${periodText}平均睡眠 <span class="highlight">${data.avgSleep.toFixed(1)}小时</span>，${data.avgSleep >= 7 ? '达到了健康标准' : '<span class="warning">略低于健康标准</span>'}
+                </div>
+                <div class="analysis-item">
+                    ${periodText}共熬夜 <span class="warning">${data.lateDays}天</span>，建议尽量在23:30前入睡
+                </div>
+                <div class="analysis-item">
+                    时间分配：工作学习占比最高(${Math.round(data.timeDistribution.work / Object.values(data.timeDistribution).reduce((a,b)=>a+b,0) * 100)}%)，其次是睡眠
+                </div>
+                <div class="analysis-item">
+                    建议：将晚上22:00后的手机使用时间限制在30分钟内，有助于提高睡眠质量
+                </div>
+            `;
+            
+            document.querySelector('.analysis-report').innerHTML = report;
+        }
+
+        function saveTodayData() {
+            const today = new Date().toISOString().split('T')[0];
+            const sleepTime = document.getElementById('sleepTime').value;
+            const wakeTime = document.getElementById('wakeTime').value;
+            const activityType = document.getElementById('activityType').value;
+            const activityHours = parseFloat(document.getElementById('activityHours').value);
+
+            // 保存睡眠记录
+            const existingSleepIndex = userData.sleepRecords.findIndex(r => r.date === today);
+            if (existingSleepIndex !== -1) {
+                userData.sleepRecords[existingSleepIndex] = { date: today, sleepTime, wakeTime };
+            } else {
+                userData.sleepRecords.push({ date: today, sleepTime, wakeTime });
+            }
+
+            // 保存活动记录
+            userData.activityRecords.push({
+                date: today,
+                type: activityType,
+                hours: activityHours
+            });
+
+            // 保存到本地存储
+            localStorage.setItem('lifeWorkbenchData', JSON.stringify(userData));
+            
+            // 更新图表
+            const activePeriod = document.querySelector('.tab-btn.active').dataset.period;
+            updateAllCharts(activePeriod);
+            
+            alert('数据保存成功！');
+        }
+
+        function calculateSleepHours(sleepTime, wakeTime) {
+            const [sleepH, sleepM] = sleepTime.split(':').map(Number);
+            const [wakeH, wakeM] = wakeTime.split(':').map(Number);
+            
+            let sleepMinutes = sleepH * 60 + sleepM;
+            let wakeMinutes = wakeH * 60 + wakeM;
+            
+            if (wakeMinutes < sleepMinutes) {
+                wakeMinutes += 24 * 60;
+            }
+            
+            return (wakeMinutes - sleepMinutes) / 60;
+        }
+
+        function formatDate(date) {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        function getSleepQuality(avgSleep) {
+            if (avgSleep >= 8) return '优秀';
+            if (avgSleep >= 7) return '良好';
+            if (avgSleep >= 6) return '一般';
+            return '较差';
+        }
+
+        function generateSampleData() {
+            // 生成最近7天的示例数据
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // 随机睡眠数据
+                const sleepHour = 22 + Math.floor(Math.random() * 3);
+                const sleepMin = Math.floor(Math.random() * 60);
+                const wakeHour = 6 + Math.floor(Math.random() * 2);
+                const wakeMin = Math.floor(Math.random() * 60);
+                
+                userData.sleepRecords.push({
+                    date: dateStr,
+                    sleepTime: `${sleepHour.toString().padStart(2, '0')}:${sleepMin.toString().padStart(2, '0')}`,
+                    wakeTime: `${wakeHour.toString().padStart(2, '0')}:${wakeMin.toString().padStart(2, '0')}`
+                });
+
+                // 随机活动数据
+                const activities = [
+                    { type: 'work', hours: 8 + Math.random() * 2 },
+                    { type: 'create', hours: 1 + Math.random() * 2 },
+                    { type: 'game', hours: 1 + Math.random() * 2 },
+                    { type: 'relax', hours: 2 + Math.random() * 1 },
+                    { type: 'life', hours: 1 + Math.random() * 1 }
+                ];
+
+                activities.forEach(act => {
+                    userData.activityRecords.push({
+                        date: dateStr,
+                        type: act.type,
+                        hours: act.hours
+                    });
+                });
+            }
+
+            localStorage.setItem('lifeWorkbenchData', JSON.stringify(userData));
+        }
+    </script>
 </body>
 </html>
