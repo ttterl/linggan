@@ -268,6 +268,21 @@
             background: #45a049;
         }
 
+        /* 数据管理模块 */
+        .data-management {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+        }
+
+        .delete-btn {
+            background: #F44336;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
         @media (max-width: 768px) {
             .charts-container {
                 grid-template-columns: 1fr;
@@ -389,7 +404,7 @@
         </div>
     </div>
 
-    <!-- 快速添加数据 -->
+    <!-- 快速添加数据 + 数据管理 -->
     <div class="quick-add">
         <h2 class="quick-add-title">快速添加今日数据</h2>
         <div class="form-group">
@@ -416,6 +431,16 @@
             <input type="number" id="activityHours" min="0" max="24" step="0.5" value="8">
         </div>
         <button onclick="saveTodayData()">保存今日数据</button>
+
+        <!-- 新增：清空某天数据功能 -->
+        <div class="data-management">
+            <h2 class="quick-add-title">数据管理</h2>
+            <div class="form-group">
+                <label for="deleteDate">选择要清空数据的日期</label>
+                <input type="date" id="deleteDate" value="">
+            </div>
+            <button class="delete-btn" onclick="deleteDayData()">清空选中日期所有数据</button>
+        </div>
     </div>
 
     <script>
@@ -429,6 +454,9 @@
         if (userData.sleepRecords.length === 0) {
             generateSampleData();
         }
+
+        // 设置日期选择器默认值为今天
+        document.getElementById('deleteDate').value = new Date().toISOString().split('T')[0];
 
         // 切换回顾周期
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -724,6 +752,36 @@
             updateAllCharts(activePeriod);
             
             alert('数据保存成功！');
+        }
+
+        // 新增：清空某天所有数据的函数
+        function deleteDayData() {
+            const deleteDate = document.getElementById('deleteDate').value;
+            
+            if (!deleteDate) {
+                alert('请先选择要清空数据的日期！');
+                return;
+            }
+
+            // 二次确认
+            if (!confirm(`确定要清空 ${deleteDate} 的所有数据吗？\n此操作不可恢复！`)) {
+                return;
+            }
+
+            // 删除该日期的睡眠记录
+            userData.sleepRecords = userData.sleepRecords.filter(r => r.date !== deleteDate);
+            
+            // 删除该日期的所有活动记录
+            userData.activityRecords = userData.activityRecords.filter(r => r.date !== deleteDate);
+
+            // 保存到本地存储
+            localStorage.setItem('lifeWorkbenchData', JSON.stringify(userData));
+            
+            // 更新图表
+            const activePeriod = document.querySelector('.tab-btn.active').dataset.period;
+            updateAllCharts(activePeriod);
+            
+            alert(`已成功清空 ${deleteDate} 的所有数据！`);
         }
 
         function calculateSleepHours(sleepTime, wakeTime) {
